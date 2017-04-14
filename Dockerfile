@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python-gps=3.11-3 \
     python-pip=1.5.6-5 \
     python-dev=2.7.9-1 && \
+    aircrack-ng \
     apt-get clean && \
     apt-get -y autoclean && \
     apt-get -y autoremove && \

@@ -12,6 +12,7 @@ from decomposer import Decomposer  # NOQA
 from arfcn_correlator import ArfcnCorrelator  # NOQA
 from cgi_correlator import CgiCorrelator  # NOQA
 from geo_correlator import GeoCorrelator  # NOQA
+from probe_req_capture import ProbeReqGatherer  # NOQA
 
 __author__ = "Ash Wilson"
 __version__ = "3.7.1"

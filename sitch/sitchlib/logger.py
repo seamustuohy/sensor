@@ -52,6 +52,7 @@ class LogHandler:
                         "arfcn_enricher": "arfcn_enricher.log",
                         "geo_ip": "geoip.log",
                         "gps": "gps.log",
+                        "probe_req":"probe.log",
                         "heartbeat": "heartbeat.log",
                         "health_check": "health_check.log",
                         "sitch_alert": "sitch_alert.log",

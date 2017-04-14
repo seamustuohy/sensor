@@ -79,6 +79,9 @@ def main():
     gsm_modem_consumer_thread = threading.Thread(target=gsm_modem_consumer,
                                                  name="gsm_modem_consumer",
                                                  args=[config])
+    probe_requestor_consumer_thread = threading.Thread(target=probe_requestor,
+                                                 name="probe_requestor",
+                                                 args=[config])
     geoip_consumer_thread = threading.Thread(target=geoip_consumer,
                                              name="geoip_consumer",
                                              args=[config])
@@ -102,6 +105,7 @@ def main():
                                      args=[config])
     kalibrate_consumer_thread.daemon = True
     gsm_modem_consumer_thread.daemon = True
+    probe_requestor_consumer_thread.daemon = True
     geoip_consumer_thread.daemon = True
     gps_consumer_thread.daemon = True
     # enricher_thread.daemon = True
@@ -115,6 +119,8 @@ def main():
     kalibrate_consumer_thread.start()
     print("Runner: Starting GSM Modem consumer thread...")
     gsm_modem_consumer_thread.start()
+    print("Runner: Starting Probe Request consumer thread...")
+    probe_requestor_consumer_thread.start()
     print("Runner: Starting GPS consumer thread...")
     gps_consumer_thread.start()
     print("Runner: Starting GeoIP consumer thread...")
@@ -323,6 +329,17 @@ def cgi_correlator(config):
             # Queue must be empty...
             time.sleep(1)
 
+def probe_requestor(config):
+    """Probe request capture thread"""
+    salt = getenv("PROBEREQ_SALT")
+    requestor = sitchlib.ProbeReqGatherer(salt, scan_results_queue)
+    while True:
+        if sitchlib.Utility.wifi_monitoring is False:
+            sitchlib.Utility.start_component("airmon-ng start wlan0")
+        print("Runner: Enabled WiFi monitoring")
+        capture_length = getenv("PROBEREQ_CAP_LEN")
+        print("Runner: Starting capture {0} seconds".format(capture_length))
+        capture = requestor.start_capture(capture_length=capture_length)
 
 def geo_correlator(config):
     """Correlate GPS events, look for drift."""
@@ -347,6 +364,7 @@ def decomposer(config):
         * `cell` (full scan from cellular radio)
         * `gsm_modem_channel` (channel extracted from GSM modem output)
         * `gps` (output from gpsd)
+        * `probe_req (output from pyshark WiFi probe requests)
     """
     d_composer = sitchlib.Decomposer
     while True:
@@ -362,6 +380,8 @@ def decomposer(config):
                         message_write_queue.append(result)
                     elif s_type == "kal_channel":
                         arfcn_correlator_queue.append(result)
+                        message_write_queue.append(result)
+                    elif s_type == "probe_req":
                         message_write_queue.append(result)
                     elif s_type == "cell":
                         message_write_queue.append(result)

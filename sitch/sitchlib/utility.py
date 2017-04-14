@@ -62,6 +62,32 @@ class Utility:
         return True
 
     @classmethod
+    def wifi_monitoring(cls):
+        """
+        (C) 2011 Derv Merkler
+        https://github.com/derv82/wifite/blob/master/wifite.py
+        """
+        with open(os.devnull, 'w') as DN:
+            proc = subprocess.Popen(['iwconfig'],
+                                    stdout=subprocess.PIPE,
+                                    stderr=DN)
+            iface = ''
+            monitors = []
+            adapters = []
+            for line in proc.communicate()[0].split('\n'):
+                if len(line) == 0: continue
+                if ord(line[0]) != 32:  # Doesn't start with space
+                    iface = line[:line.find(' ')]  # is the interface
+                if line.find('Mode:Monitor') != -1:
+                    monitors.append(iface)
+                else:
+                    adapters.append(iface)
+        if len(monitors) > 0:
+            return True
+        else:
+            return False
+
+    @classmethod
     def create_path_if_nonexistent(cls, path):
         """Create filesystem directory path."""
         if os.path.exists(path) and os.path.isdir(path):

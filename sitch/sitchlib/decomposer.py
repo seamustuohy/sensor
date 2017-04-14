@@ -4,13 +4,14 @@ from gps_decomposer import GpsDecomposer
 from gsm_decomposer import GsmDecomposer
 from kal_decomposer import KalDecomposer
 from geoip_decomposer import GeoipDecomposer
-
+from probe_req_decomposer import ProbeReqDecomposer
 
 class Decomposer(object):
     """Decompose device messages into normalized log messages."""
 
     decomp_ref = {"Kalibrate": KalDecomposer(),
                   "GSM_MODEM": GsmDecomposer(),
+                  "probe_req": ProbeReqDecomposer()
                   "gpsd": GpsDecomposer(),
                   "geo_ip": GeoipDecomposer()}
 
